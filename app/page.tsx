@@ -1,11 +1,4 @@
 import React from "react";
-
-const page = () => {
-  return <>Overview or Quick Access</>;
-};
-
-
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/card";
 import { Calendar, Users, UserRound, Activity, Clock, Home } from "lucide-react";
 
