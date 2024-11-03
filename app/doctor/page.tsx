@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/app/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/app/components/ui/card"
 import { Input } from "@/app/components/ui/input"
@@ -18,69 +19,28 @@ import { Progress } from "@/app/components/ui/progress"
 import { Textarea } from "@/app/components/ui/textarea"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/app/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/app/components/ui/dialog"
-import { Calendar as CalendarIcon,  Sun, Moon, Users, MessageSquare, BarChart, FileText,  Settings, Plus, Search, Edit, Trash2, CheckCircle,   Package, DollarSign, Clipboard, Menu, LogOut, User, Stethoscope } from "lucide-react"
+import { Calendar as CalendarIcon,  Sun, Moon, Users, MessageSquare,  FileText,  Settings, Plus, Search, Edit, Trash2, DollarSign, Clipboard, Menu, LogOut, User, Stethoscope } from "lucide-react"
 import { format } from "date-fns"
-
-// Mock data (expanded)
-const mockPatients = [
-  { id: 1, name: "John Doe", age: 35, lastVisit: "2023-05-15", nextAppointment: "2023-11-20", medicalHistory: "Allergic to penicillin", ongoingTreatments: "Root Canal", status: "In Progress", priority: "Medium", allergies: ["Penicillin"], procedures: ["Cleaning", "X-Ray"], notes: "Patient experiences dental anxiety", image: "/placeholder-avatar.jpg" },
-  { id: 2, name: "Jane Smith", age: 28, lastVisit: "2023-06-22", nextAppointment: "2023-12-05", medicalHistory: "None", ongoingTreatments: "Teeth Whitening", status: "Scheduled", priority: "Low", allergies: [], procedures: ["Whitening"], notes: "Interested in cosmetic dentistry", image: "/placeholder-avatar.jpg" },
-  { id: 3, name: "Mike Johnson", age: 42, lastVisit: "2023-07-10", nextAppointment: "2023-11-25", medicalHistory: "Diabetes", ongoingTreatments: "Dental Implants", status: "Completed", priority: "High", allergies: ["Latex"], procedures: ["Implant", "Crown"], notes: "Requires frequent follow-ups due to diabetes", image: "/placeholder-avatar.jpg" },
-  { id: 4, name: "Emily Brown", age: 31, lastVisit: "2023-08-05", nextAppointment: "2023-12-10", medicalHistory: "Pregnancy - 2nd trimester", ongoingTreatments: "Regular Checkup", status: "Scheduled", priority: "Medium", allergies: [], procedures: ["Cleaning"], notes: "Extra care needed due to pregnancy", image: "/placeholder-avatar.jpg" },
-  { id: 5, name: "David Wilson", age: 55, lastVisit: "2023-09-18", nextAppointment: "2023-11-30", medicalHistory: "High blood pressure", ongoingTreatments: "Dentures Fitting", status: "In Progress", priority: "Medium", allergies: ["Codeine"], procedures: ["Dentures"], notes: "Monitor blood pressure before procedures", image: "/placeholder-avatar.jpg" },
-]
-
-const mockAppointments = [
-  { id: 1, patientId: 1, date: "2023-11-20", time: "09:00", type: "Root Canal", status: "Scheduled", notes: "Patient requested early morning appointment" },
-  { id: 2, patientId: 2, date: "2023-12-05", time: "10:30", type: "Teeth Whitening", status: "Confirmed", notes: "Follow-up appointment after initial consultation" },
-  { id: 3, patientId: 3, date: "2023-11-25", time: "14:00", type: "Implant Checkup", status: "Scheduled", notes: "Post-operative checkup" },
-  { id: 4, patientId: 4, date: "2023-12-10", time: "11:00", type: "Regular Checkup", status: "Confirmed", notes: "Routine pregnancy dental check" },
-  { id: 5, patientId: 5, date: "2023-11-30", time: "15:30", type: "Dentures Fitting", status: "Scheduled", notes: "Final fitting session" },
-]
-
-const mockInventory = [
-  { id: 1, name: "Dental Floss", quantity: 45, status: "Good", lastRestocked: "2023-10-15", supplier: "DentalSupplies Inc." },
-  { id: 2, name: "Latex Gloves", quantity: 12, status: "Low", lastRestocked: "2023-09-30", supplier: "MedEquip Co." },
-  { id: 3, name: "Face Masks", quantity: 30, status: "Good", lastRestocked: "2023-10-05", supplier: "SafetyFirst Ltd." },
-  { id: 4, name: "Dental Mirrors", quantity: 20, status: "Good", lastRestocked: "2023-08-20", supplier: "DentalTools Corp." },
-  { id: 5, name: "Anesthetic", quantity: 5, status: "Low", lastRestocked: "2023-09-10", supplier: "MedPharm Inc." },
-]
-
-const mockBillingRecords = [
-  { id: 1, patientId: 1, treatment: "Root Canal", amount: 800, status: "Paid", date: "2023-11-05", paymentMethod: "Credit Card" },
-  { id: 2, patientId: 2, treatment: "Teeth Whitening", amount: 250, status: "Pending", date: "2023-11-10", paymentMethod: "Pending" },
-  { id: 3, patientId: 3, treatment: "Dental Implant", amount: 3000, status: "Partial", date: "2023-10-25", paymentMethod: "Cash" },
-  { id: 4, patientId: 4, treatment: "Regular Checkup", amount: 150, status: "Paid", date: "2023-11-15", paymentMethod: "Insurance" },
-  { id: 5, patientId: 5, treatment: "Dentures", amount: 1200, status: "Pending", date: "2023-11-20", paymentMethod: "Pending" },
-]
-
-
-const mockMessages = [
-    { id: 1, from: 'John Doe', to: 'Dr. Smith', content: 'Can we reschedule my appointment?', timestamp: '2023-11-19T09:00:00', read: false },
-    { id: 2, from: 'Dr. Smith', to: 'Jane Smith', content: 'Your test results are ready.', timestamp: '2023-11-18T14:30:00', read: true },
-    { id: 3, from: 'Mike Johnson', to: 'Dr. Smith', content: 'Thank you for the great service!', timestamp: '2023-11-17T11:15:00', read: true },
-    { id: 4, from: 'Dr. Smith', to: 'Emily Brown', content: 'Don\'t forget your appointment tomorrow.', timestamp: '2023-11-19T16:45:00', read: false }, // Fixed quotation
-    { id: 5, from: 'David Wilson', to: 'Dr. Smith', content: 'I have a question about my medication.', timestamp: '2023-11-18T10:20:00', read: false },
-  ];
-  
+import MockData from "../data/MockData"
+import { Patient } from "../data/MockData"
 
 export default function InteractiveDashboardComponent() {
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isPatientProfileOpen, setIsPatientProfileOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [activeTab, setActiveTab] = useState("'appointments'")
-  const [patients, setPatients] = useState(mockPatients)
-  const [appointments, setAppointments] = useState(mockAppointments)
-  const [inventory, setInventory] = useState(mockInventory)
-  const [billingRecords, setBillingRecords] = useState(mockBillingRecords)
-  const [todos, setTodos] = useState(mockTodos)
-  const [messages, setMessages] = useState(mockMessages)
+  const [patients, setPatients] = useState(MockData.mockPatients)
+  const [appointments, setAppointments] = useState(MockData.mockAppointments)
+  const [inventory, setInventory] = useState(MockData.mockInventory)
+  const [billingRecords, setBillingRecords] = useState(MockData.mockBillingRecords)
+  const [messages, setMessages] = useState(MockData.mockMessages)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
   const [searchTerm, setSearchTerm] = useState("''")
   const [isAddPatientDialogOpen, setIsAddPatientDialogOpen] = useState(false)
   const [isAddBillingRecordDialogOpen, setIsAddBillingRecordDialogOpen] = useState(false)
   const [isAddTodoDialogOpen, setIsAddTodoDialogOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [selectedPatient, setSelectedPatient] = useState(null)
-  const [isPatientProfileOpen, setIsPatientProfileOpen] = useState(false)
+
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode)
@@ -93,60 +53,48 @@ export default function InteractiveDashboardComponent() {
   );
   
 
-  const addPatient = (newPatient) => {
+  const addPatient = (newPatient : any) => {
     setPatients([...patients, { ...newPatient, id: patients.length + 1 }])
     setIsAddPatientDialogOpen(false)
   }
 
-  const updatePatient = (updatedPatient) => {
+  const updatePatient = (updatedPatient : any) => {
     setPatients(patients.map(p => p.id === updatedPatient.id ? updatedPatient : p))
   }
 
-  const deletePatient = (patientId) => {
+  const deletePatient = (patientId : any) => {
     setPatients(patients.filter(p => p.id !== patientId))
   }
 
-  const addInventoryItem = (newItem) => {
+  const addInventoryItem = (newItem: any ) => {
     setInventory([...inventory, { ...newItem, id: inventory.length + 1 }])
-    setIsAddInventoryItemDialogOpen(false)
+    setIsAddPatientDialogOpen(false)
   }
 
-  const updateInventoryItem = (updatedItem) => {
+  const updateInventoryItem = (updatedItem: any) => {
     setInventory(inventory.map(i => i.id === updatedItem.id ? updatedItem : i))
   }
 
-  const deleteInventoryItem = (itemId) => {
+  const deleteInventoryItem = (itemId : any ) => {
     setInventory(inventory.filter(i => i.id !== itemId))
   }
 
-  const addBillingRecord = (newRecord) => {
+  const addBillingRecord = (newRecord: any) => {
     setBillingRecords([...billingRecords, { ...newRecord, id: billingRecords.length + 1 }])
     setIsAddBillingRecordDialogOpen(false)
   }
 
-  const updateBillingRecord = (updatedRecord) => {
+  const updateBillingRecord = (updatedRecord: any ) => {
     setBillingRecords(billingRecords.map(r => r.id === updatedRecord.id ? updatedRecord : r))
   }
 
-  const deleteBillingRecord = (recordId) => {
+  const deleteBillingRecord = (recordId: any ) => {
     setBillingRecords(billingRecords.filter(r => r.id !== recordId))
   }
 
 
-  const onDragEnd = (result) => {
-    if (!result.destination) {
-      return
-    }
 
-    const items = Array.from(todos)
-    const [reorderedItem] = items.splice(result.source.index, 1)
-    
-    items.splice(result.destination.index, 0, reorderedItem)
-
-    setTodos(items)
-  }
-
-  const openPatientProfile = (patient) => {
+  const openPatientProfile = (patient: any ) => {
     setSelectedPatient(patient)
     setIsPatientProfileOpen(true)
   }
@@ -236,26 +184,17 @@ export default function InteractiveDashboardComponent() {
                   <Clipboard className="mr-2 h-4 w-4" />
                   Treatments
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => setActiveTab("inventory")}>
-                  <Package className="mr-2 h-4 w-4" />
-                  Inventory
-                </Button>
+  
                 <Button variant="ghost" className="w-full justify-start" onClick={() => setActiveTab("billing")}>
                   <DollarSign className="mr-2 h-4 w-4" />
                   Billing
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => setActiveTab("todos")}>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Todos
-                </Button>
+             
                 <Button variant="ghost" className="w-full justify-start" onClick={() => setActiveTab("messages")}>
                   <MessageSquare className="mr-2 h-4 w-4" />
                   Messages
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={() => setActiveTab("analytics")}>
-                  <BarChart className="mr-2 h-4 w-4" />
-                  Analytics
-                </Button>
+               
               </nav>
             </motion.aside>
           )}
@@ -296,11 +235,11 @@ export default function InteractiveDashboardComponent() {
                           <TableHead>Time</TableHead>
                           <TableHead>Type</TableHead>
                           <TableHead>Status</TableHead>
-                          <TableHead>Actions</TableHead>
+                        
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {appointments.map((appointment) => (
+                        {appointments.map((appointment ) => (
                           <TableRow key={appointment.id}>
                             <TableCell>{patients.find(p => p.id === appointment.patientId)?.name}</TableCell>
                             <TableCell>{appointment.date}</TableCell>
@@ -310,17 +249,6 @@ export default function InteractiveDashboardComponent() {
                               <Badge variant={appointment.status === "Confirmed" ? "default" : "secondary"}>
                                 {appointment.status}
                               </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm" onClick={() => updateAppointment({ ...appointment, status: "'Confirmed'" })}>
-                                <CheckCircle className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm" onClick={() => {/* Open edit appointment dialog */}}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm" onClick={() => deleteAppointment(appointment.id)}>
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -372,17 +300,19 @@ export default function InteractiveDashboardComponent() {
                             <TableCell>{patient.age}</TableCell>
                             <TableCell>{patient.lastVisit}</TableCell>
                             <TableCell>{patient.nextAppointment}</TableCell>
+                         
                             <TableCell>
-                              <Badge variant={patient.status === "'Completed'" ? "'success'" : patient.status === "'In Progress'" ? "'warning'" : "'secondary'"}>
-                                {patient.status}
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant={patient.priority === "'High'" ? "'destructive'" : patient.priority === "'Medium'" ? "'warning'" : "'secondary'"}>
-                                {patient.priority}
-                              </Badge>
-                            </TableCell>
-                     
+  <Badge variant={patient.status === "Completed" ? "secondary" : patient.status === "In Progress" ? "secondary" : "secondary"}>
+    {patient.status}
+  </Badge>
+</TableCell>
+<TableCell>
+  <Badge variant={patient.priority === "High" ? "destructive" : patient.priority === "Medium" ? "secondary" : "default"}>
+    {patient.priority}
+  </Badge>
+</TableCell>
+
+
                           </TableRow>
                         ))}
                       </TableBody>
@@ -467,9 +397,10 @@ export default function InteractiveDashboardComponent() {
                             <TableCell>{record.treatment}</TableCell>
                             <TableCell>${record.amount}</TableCell>
                             <TableCell>
-                              <Badge variant={record.status === "'Paid'" ? "'success'" : record.status === "'Pending'" ? "'warning'" : "'destructive'"}>
-                                {record.status}
-                              </Badge>
+                            <Badge variant={record.status === "Paid" ? "secondary" : record.status === "Pending" ? "secondary" : "destructive"}>
+                              {record.status}
+                                            </Badge>
+
                             </TableCell>
                             <TableCell>{record.date}</TableCell>
                             <TableCell>{record.paymentMethod}</TableCell>
@@ -627,8 +558,8 @@ export default function InteractiveDashboardComponent() {
                     <SelectValue placeholder="Select patient" />
                   </SelectTrigger>
                   <SelectContent>
-                    {patients.map((patient) => (
-                      <SelectItem key={patient.id} value={patient.id.toString()}>{patient.name}</SelectItem>
+                    {patients.map((patient ) => (
+                      <SelectItem key={patient.id } value={patient.id.toString()}>{patient.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -655,56 +586,58 @@ export default function InteractiveDashboardComponent() {
 
      
       <Dialog open={isPatientProfileOpen} onOpenChange={setIsPatientProfileOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Patient Profile</DialogTitle>
-            <DialogDescription>Detailed information about the patient.</DialogDescription>
-          </DialogHeader>
-          {selectedPatient && (
-            <div className="grid gap-4 py-4">
-              <div className="flex items-center space-x-4">
-                <Avatar className="w-16 h-16">
-                  <AvatarImage src={selectedPatient.image} alt={selectedPatient.name} />
-                  <AvatarFallback>{selectedPatient.name[0]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="text-lg font-semibold">{selectedPatient.name}</h3>
-                  <p className="text-sm text-gray-500">Age: {selectedPatient.age}</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium">Last Visit</p>
-                  <p className="text-sm">{selectedPatient.lastVisit}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Next Appointment</p>
-                  <p className="text-sm">{selectedPatient.nextAppointment}</p>
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-medium">Medical History</p>
-                <p className="text-sm">{selectedPatient.medicalHistory}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium">Ongoing Treatments</p>
-                <p className="text-sm">{selectedPatient.ongoingTreatments}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium">Allergies</p>
-                <p className="text-sm">{selectedPatient.allergies.join("', '") || "'None'"}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium">Notes</p>
-                <p className="text-sm">{selectedPatient.notes}</p>
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button onClick={() => setIsPatientProfileOpen(false)}>Close</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+  <DialogContent className="sm:max-w-[425px]">
+    <DialogHeader>
+      <DialogTitle>Patient Profile</DialogTitle>
+      <DialogDescription>Detailed information about the patient.</DialogDescription>
+    </DialogHeader>
+    {selectedPatient && (
+      <div className="grid gap-4 py-4">
+        <div className="flex items-center space-x-4">
+          <Avatar className="w-16 h-16">
+            <AvatarImage src={selectedPatient.name} alt={selectedPatient.name} />
+            <AvatarFallback>{selectedPatient.name[0]}</AvatarFallback>
+          </Avatar>
+          <div>
+            <h3 className="text-lg font-semibold">{selectedPatient.name}</h3>
+            <p className="text-sm text-gray-500">Age: {selectedPatient.age}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <p className="text-sm font-medium">Last Visit</p>
+            <p className="text-sm">{selectedPatient.lastVisit}</p>
+          </div>
+          <div>
+            <p className="text-sm font-medium">Next Appointment</p>
+            <p className="text-sm">{selectedPatient.nextAppointment}</p>
+          </div>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Medical History</p>
+          <p className="text-sm">{selectedPatient.medicalHistory}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Ongoing Treatments</p>
+          <p className="text-sm">{selectedPatient.ongoingTreatments}</p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Allergies</p>
+          <p className="text-sm">
+            {selectedPatient.allergies.length > 0
+              ? selectedPatient.allergies.join("', '")
+              : "'None'"}
+          </p>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Notes</p>
+          <p className="text-sm">{selectedPatient.notes}</p>
+        </div>
+      </div>
+    )}
+  </DialogContent>
+</Dialog>
+
     </div>
   )
 }
