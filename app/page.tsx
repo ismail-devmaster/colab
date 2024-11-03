@@ -1,3 +1,8 @@
+import React from "react";
+
+const page = () => {
+  return <>Overview or Quick Access</>;
+};
 
 
 import React from 'react';
@@ -135,3 +140,4 @@ export default function HomePage() {
 
   );
 }
+
