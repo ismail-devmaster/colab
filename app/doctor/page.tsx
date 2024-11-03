@@ -21,25 +21,26 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/app/components/ui/dialog"
 import { Calendar as CalendarIcon,  Sun, Moon, Users, MessageSquare,  FileText,  Settings, Plus, Search, Edit, Trash2, DollarSign, Clipboard, Menu, LogOut, User, Stethoscope } from "lucide-react"
 import { format } from "date-fns"
-import MockData from "../data/MockData"
+import * as MockData from "../data/MockData"
 import { Patient } from "../data/MockData"
+
 
 export default function InteractiveDashboardComponent() {
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [isPatientProfileOpen, setIsPatientProfileOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  const [activeTab, setActiveTab] = useState("'appointments'")
-  const [patients, setPatients] = useState(MockData.mockPatients)
-  const [appointments, setAppointments] = useState(MockData.mockAppointments)
-  const [inventory, setInventory] = useState(MockData.mockInventory)
-  const [billingRecords, setBillingRecords] = useState(MockData.mockBillingRecords)
-  const [messages, setMessages] = useState(MockData.mockMessages)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
-  const [searchTerm, setSearchTerm] = useState("''")
-  const [isAddPatientDialogOpen, setIsAddPatientDialogOpen] = useState(false)
-  const [isAddBillingRecordDialogOpen, setIsAddBillingRecordDialogOpen] = useState(false)
-  const [isAddTodoDialogOpen, setIsAddTodoDialogOpen] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [activeTab, setActiveTab] = useState(MockData.default.MockAppointments); 
+  const [patients, setPatients] = useState<Patient[]>(MockData.default.MockPatients);
+  const [appointments, setAppointments] = useState(MockData.default.MockAppointments);
+  const [inventory, setInventory] = useState(MockData.default.MockInventory); 
+  const [billingRecords, setBillingRecords] = useState(MockData.default.MockBillingRecords); 
+  const [messages, setMessages] = useState(MockData.default.MockMessages); 
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddPatientDialogOpen, setIsAddPatientDialogOpen] = useState(false);
+  const [isAddBillingRecordDialogOpen, setIsAddBillingRecordDialogOpen] = useState(false);
+  const [isAddTodoDialogOpen, setIsAddTodoDialogOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
 
   const toggleDarkMode = () => {
@@ -72,11 +73,11 @@ export default function InteractiveDashboardComponent() {
   }
 
   const updateInventoryItem = (updatedItem: any) => {
-    setInventory(inventory.map(i => i.id === updatedItem.id ? updatedItem : i))
+    setInventory(inventory.map((i: { id: any })  => i.id === updatedItem.id ? updatedItem : i))
   }
 
   const deleteInventoryItem = (itemId : any ) => {
-    setInventory(inventory.filter(i => i.id !== itemId))
+    setInventory(inventory.filter((i: { id: any }) => i.id !== itemId))
   }
 
   const addBillingRecord = (newRecord: any) => {
@@ -85,11 +86,11 @@ export default function InteractiveDashboardComponent() {
   }
 
   const updateBillingRecord = (updatedRecord: any ) => {
-    setBillingRecords(billingRecords.map(r => r.id === updatedRecord.id ? updatedRecord : r))
+    setBillingRecords(billingRecords.map((r: { id: any }) => r.id === updatedRecord.id ? updatedRecord : r))
   }
 
   const deleteBillingRecord = (recordId: any ) => {
-    setBillingRecords(billingRecords.filter(r => r.id !== recordId))
+    setBillingRecords(billingRecords.filter((r: { id: any }) => r.id !== recordId))
   }
 
 
@@ -239,7 +240,7 @@ export default function InteractiveDashboardComponent() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {appointments.map((appointment ) => (
+                        {appointments.map((appointment: any ) => (
                           <TableRow key={appointment.id}>
                             <TableCell>{patients.find(p => p.id === appointment.patientId)?.name}</TableCell>
                             <TableCell>{appointment.date}</TableCell>
@@ -259,67 +260,79 @@ export default function InteractiveDashboardComponent() {
               </TabsContent>
 
               <TabsContent value="patients">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Patients</CardTitle>
-                    <CardDescription>Manage patient records</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex justify-between mb-4">
-                      <div className="flex space-x-2">
-                        <Input
-                          
-                        
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <Button>
-                          <Search className="mr-2 h-4 w-4" />
-                          Search
-                        </Button>
-                      </div>
-                      <Button onClick={() => setIsAddPatientDialogOpen(true)}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Patient
-                      </Button>
-                    </div>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Age</TableHead>
-                          <TableHead>Last Visit</TableHead>
-                          <TableHead>Next Appointment</TableHead>
-                          <TableHead>Status</TableHead>
-                  
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredPatients.map((patient) => (
-                          <TableRow key={patient.id}>
-                            <TableCell>{patient.name}</TableCell>
-                            <TableCell>{patient.age}</TableCell>
-                            <TableCell>{patient.lastVisit}</TableCell>
-                            <TableCell>{patient.nextAppointment}</TableCell>
-                         
-                            <TableCell>
-  <Badge variant={patient.status === "Completed" ? "secondary" : patient.status === "In Progress" ? "secondary" : "secondary"}>
+  <Card>
+    <CardHeader>
+      <CardTitle>Patients</CardTitle>
+      <CardDescription>Manage patient records</CardDescription>
+    </CardHeader>
+    <CardContent>
+      <div className="flex justify-between mb-4">
+        <div className="flex space-x-2">
+          <Input
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search by name"
+          />
+          <Button>
+            <Search className="mr-2 h-4 w-4" />
+            Search
+          </Button>
+        </div>
+        <Button onClick={() => setIsAddPatientDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Add Patient
+        </Button>
+      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Age</TableHead>
+            <TableHead>Last Visit</TableHead>
+            <TableHead>Next Appointment</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Priority</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {filteredPatients.length > 0 ? (
+            filteredPatients.map((patient) => (
+              <TableRow key={patient.id}>
+                <TableCell>{patient.name}</TableCell>
+                <TableCell>{patient.age}</TableCell>
+                <TableCell>{patient.lastVisit}</TableCell>
+                <TableCell>{patient.nextAppointment}</TableCell>
+                <TableCell>
+                <Badge variant={
+    patient.status === "Completed" ? "secondary" :
+    patient.status === "In Progress" ? "default" : // Change "warning" to "default"
+    "default" // Fallback to default if none match
+  }>
     {patient.status}
   </Badge>
-</TableCell>
-<TableCell>
-  <Badge variant={patient.priority === "High" ? "destructive" : patient.priority === "Medium" ? "secondary" : "default"}>
+                </TableCell>
+                <TableCell>
+                <Badge variant={
+    patient.priority === "High" ? "destructive" :
+    patient.priority === "Medium" ? "secondary" : // Change "warning" to "secondary"
+    "default" // Fallback to default if none match
+  }>
     {patient.priority}
   </Badge>
-</TableCell>
-
-
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center">
+                No patients found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </CardContent>
+  </Card>
+</TabsContent>
 
               <TabsContent value="treatments">
                 <Card>
@@ -391,7 +404,7 @@ export default function InteractiveDashboardComponent() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {billingRecords.map((record) => (
+                        {billingRecords.map((record: any) => (
                           <TableRow key={record.id}>
                             <TableCell>{patients.find(p => p.id === record.patientId)?.name}</TableCell>
                             <TableCell>{record.treatment}</TableCell>
@@ -438,7 +451,7 @@ export default function InteractiveDashboardComponent() {
                       </Button>
                     </div>
                     <ScrollArea className="h-[400px]">
-                      {messages.map((message) => (
+                      {messages.map((message: any) => (
                         <div key={message.id} className="flex items-start space-x-4 mb-4">
                           <Avatar>
                             <AvatarImage src="/placeholder-avatar.jpg" alt={message.from} />
@@ -460,39 +473,21 @@ export default function InteractiveDashboardComponent() {
               </TabsContent>
 
             </Tabs>
-
-            {/* Quick Actions */}
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Button className="w-full" variant="outline" onClick={() => setIsAddPatientDialogOpen(true)}>
-                  <Users className="mr-2 h-4 w-4" />
-                  Add Patient
-                </Button>
-                <Button className="w-full" variant="outline" onClick={() => setIsAddBillingRecordDialogOpen(true)}>
-                  <FileText className="mr-2 h-4 w-4" />
-                  Create Invoice
-                </Button>
-                <Button className="w-full" variant="outline" onClick={() => setActiveTab("messages")}>
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Send Message
-                </Button>
-              </div>
-            </div>
+        
           </motion.div>
         </main>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t text-center bg-white dark:bg-gray-900">
-        <div className="container flex flex-col items-center text-center justify-center  py-10 md:h-24 md:flex-row md:py-0">
-          <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
-            <p className="text-center text-sm leading-loose text-gray-600 dark:text-gray-400 md:text-left">
-              © 2023 DentaCare. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+   {/* Footer */}
+<footer className="fixed bottom-0 left-0 right-0 border-t text-center bg-white dark:bg-gray-900">
+  <div className="container flex flex-col items-center justify-center py-10 md:h-24 md:flex-row md:py-0">
+    <div className="flex flex-col items-center gap-4 px-8 md:flex-row md:gap-2 md:px-0">
+      <p className="text-center text-sm leading-loose text-gray-600 dark:text-gray-400 md:text-left">
+        © 2023 DentaCare. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
 
       {/* Dialogs */}
       <Dialog open={isAddPatientDialogOpen} onOpenChange={setIsAddPatientDialogOpen}>
