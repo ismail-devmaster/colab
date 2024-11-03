@@ -2,28 +2,28 @@
 
 import * as React from "react";
 import { Calendar as CalendarIcon, Clock, Plus } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/app/components/ui/avatar";
+import { Button } from "@/app/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/app/components/ui/card";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar";
+} from "@/app/components/ui/select";
+import { Calendar } from "@/app/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
+} from "@/app/components/ui/popover";
 import {
   Dialog,
   DialogContent,
@@ -31,10 +31,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
+} from "@/app/components/ui/dialog";
+import { Input } from "@/app/components/ui/input";
+import { Label } from "@/app/components/ui/label";
+import { cn } from "@/app//lib/utils";
 import { format, isWeekend } from "date-fns";
 
 type DoctorAvailability = {
@@ -113,7 +113,7 @@ const ReceptionistDoctor = () => {
   };
 
   return (
-    <Card className="mb-8">
+    <Card className="mb-8 ">
       <CardHeader>
         <CardTitle>Doctor Schedule Management</CardTitle>
         <CardDescription>
